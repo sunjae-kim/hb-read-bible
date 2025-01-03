@@ -3,13 +3,7 @@
 import { KAKAO_CLIENT_SECRET, KAKAO_REDIRECT_URI, KAKAO_REST_API_KEY } from '@/constants'
 import { auth, kakaoProvider } from '@/lib/firebase'
 import axios from 'axios'
-import {
-  browserSessionPersistence,
-  onAuthStateChanged,
-  setPersistence,
-  signInWithCredential,
-  type User,
-} from 'firebase/auth'
+import { browserSessionPersistence, setPersistence, signInWithCredential } from 'firebase/auth'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
 
@@ -45,9 +39,10 @@ const AuthKakaoCallbackPageInner = () => {
 
       await setPersistence(auth, browserSessionPersistence)
       await signInWithCredential(auth, credential)
+
+      router.push('/')
     } catch (err) {
       setError(err instanceof Error ? err : new Error('로그인 처리 중 오류가 발생했습니다.'))
-      // 에러 발생 시 에러 페이지나 로그인 페이지로 리다이렉트
       router.push('/')
     }
   }, [code, router])
@@ -59,22 +54,7 @@ const AuthKakaoCallbackPageInner = () => {
       return
     }
 
-    const unsubscribe = onAuthStateChanged(
-      auth,
-      (user: User | null) => {
-        if (user) {
-          router.push('/')
-        } else {
-          fetchToken()
-        }
-      },
-      (error) => {
-        setError(error)
-        router.push('/')
-      },
-    )
-
-    return () => unsubscribe()
+    fetchToken()
   }, [code, fetchToken, router])
 
   if (error) {

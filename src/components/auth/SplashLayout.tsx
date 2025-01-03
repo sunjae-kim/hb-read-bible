@@ -1,16 +1,14 @@
 'use client'
 
-import { useAuthStore } from '@/stores/auth'
 import { useBibleStore } from '@/stores/bible'
 import { usePlanStore } from '@/stores/plan'
 import Image from 'next/image'
 import { PropsWithChildren, useEffect, useState } from 'react'
 
 export const SplashLayout = ({ children }: PropsWithChildren) => {
-  const authInitialized = useAuthStore((state) => state.initialized)
   const { initialized: bibleInitialized, initialize: bibleInitialize, loadingState } = useBibleStore()
   const { loadDefaultPlan } = usePlanStore()
-  const [showSplash, setShowSplash] = useState(true)
+  const [showSplash, setShowSplash] = useState(false)
   const [isHiding, setIsHiding] = useState(false)
 
   useEffect(() => {
@@ -19,7 +17,13 @@ export const SplashLayout = ({ children }: PropsWithChildren) => {
   }, [bibleInitialize, loadDefaultPlan])
 
   useEffect(() => {
-    if (authInitialized && bibleInitialized) {
+    if (loadingState.stage === 'downloading' || loadingState.stage === 'initializing') {
+      setShowSplash(true)
+    }
+  }, [loadingState.stage])
+
+  useEffect(() => {
+    if (bibleInitialized && showSplash) {
       const timer = setTimeout(() => {
         setIsHiding(true)
         const hideTimer = setTimeout(() => {
@@ -29,9 +33,9 @@ export const SplashLayout = ({ children }: PropsWithChildren) => {
       }, 1000)
       return () => clearTimeout(timer)
     }
-  }, [authInitialized, bibleInitialized])
+  }, [bibleInitialized, showSplash])
 
-  if (!authInitialized || !bibleInitialized || showSplash) {
+  if (!bibleInitialized || showSplash) {
     return (
       <div
         className={`flex min-h-screen items-center justify-center text-center transition-opacity duration-500 ${
