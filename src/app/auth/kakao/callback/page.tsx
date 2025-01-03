@@ -1,51 +1,14 @@
 'use client'
 
-import { KAKAO_CLIENT_SECRET, KAKAO_REDIRECT_URI, KAKAO_REST_API_KEY } from '@/constants'
-import { auth, kakaoProvider } from '@/lib/firebase'
-import axios from 'axios'
-import { browserSessionPersistence, setPersistence, signInWithCredential } from 'firebase/auth'
+import { kakaoAuth } from '@/lib/kakao'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
-const AuthKakaoCallbackPageInner = () => {
+export default function AuthKakaoCallbackPage() {
   const searchParams = useSearchParams()
   const router = useRouter()
-  const code = searchParams.get('code')
   const [error, setError] = useState<Error | null>(null)
-
-  const fetchToken = useCallback(async () => {
-    try {
-      const response = await axios.post<{
-        id_token: string
-      }>(
-        'https://kauth.kakao.com/oauth/token',
-        new URLSearchParams({
-          grant_type: 'authorization_code',
-          code: code || '',
-          client_id: KAKAO_REST_API_KEY,
-          redirect_uri: KAKAO_REDIRECT_URI,
-          client_secret: KAKAO_CLIENT_SECRET,
-        }).toString(),
-        {
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-        },
-      )
-
-      const credential = kakaoProvider.credential({
-        idToken: response.data.id_token,
-      })
-
-      await setPersistence(auth, browserSessionPersistence)
-      await signInWithCredential(auth, credential)
-
-      router.push('/')
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error('로그인 처리 중 오류가 발생했습니다.'))
-      router.push('/')
-    }
-  }, [code, router])
+  const code = searchParams.get('code')
 
   useEffect(() => {
     if (!code) {
@@ -54,8 +17,14 @@ const AuthKakaoCallbackPageInner = () => {
       return
     }
 
-    fetchToken()
-  }, [code, fetchToken, router])
+    kakaoAuth
+      .signIn(code)
+      .then(() => router.push('/'))
+      .catch((err) => {
+        setError(err instanceof Error ? err : new Error('로그인 처리 중 오류가 발생했습니다.'))
+        router.push('/')
+      })
+  }, [code, router])
 
   if (error) {
     return (
@@ -73,5 +42,3 @@ const AuthKakaoCallbackPageInner = () => {
     </div>
   )
 }
-
-export default AuthKakaoCallbackPageInner

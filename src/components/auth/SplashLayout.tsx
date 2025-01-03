@@ -1,41 +1,19 @@
 'use client'
 
-import { useBibleStore } from '@/stores/bible'
 import { usePlanStore } from '@/stores/plan'
 import Image from 'next/image'
-import { PropsWithChildren, useEffect, useState } from 'react'
+import { PropsWithChildren, useEffect } from 'react'
+import { useSplashState } from '@/hooks/useSplashState'
 
 export const SplashLayout = ({ children }: PropsWithChildren) => {
-  const { initialized: bibleInitialized, initialize: bibleInitialize, loadingState } = useBibleStore()
+  const { initialized, showSplash, isHiding, loadingState } = useSplashState()
   const { loadDefaultPlan } = usePlanStore()
-  const [showSplash, setShowSplash] = useState(false)
-  const [isHiding, setIsHiding] = useState(false)
 
   useEffect(() => {
-    bibleInitialize()
     loadDefaultPlan()
-  }, [bibleInitialize, loadDefaultPlan])
+  }, [loadDefaultPlan])
 
-  useEffect(() => {
-    if (loadingState.stage === 'downloading' || loadingState.stage === 'initializing') {
-      setShowSplash(true)
-    }
-  }, [loadingState.stage])
-
-  useEffect(() => {
-    if (bibleInitialized && showSplash) {
-      const timer = setTimeout(() => {
-        setIsHiding(true)
-        const hideTimer = setTimeout(() => {
-          setShowSplash(false)
-        }, 500)
-        return () => clearTimeout(hideTimer)
-      }, 1000)
-      return () => clearTimeout(timer)
-    }
-  }, [bibleInitialized, showSplash])
-
-  if (!bibleInitialized || showSplash) {
+  if (!initialized || showSplash) {
     return (
       <div
         className={`flex min-h-screen items-center justify-center text-center transition-opacity duration-500 ${

@@ -42,6 +42,9 @@ export default {
           'sans-serif',
         ],
       },
+      colors: {
+        primary: '#557C03'
+      }
     },
   },
   plugins: [],

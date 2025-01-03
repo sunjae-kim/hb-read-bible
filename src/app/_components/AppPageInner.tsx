@@ -2,21 +2,26 @@
 
 import { KAKAO_AUTH_URL } from '@/constants'
 import { bibleManager } from '@/lib/bible'
-import { auth } from '@/lib/firebase'
 import { useAuthStore } from '@/stores/auth'
-import { signOut } from 'firebase/auth'
+import { useLoadingStore } from '@/stores/loading'
 import { toast } from 'react-hot-toast'
 
 const AppPageInner = () => {
   const user = useAuthStore((state) => state.user)
+  const isAuthLoading = useLoadingStore((state) => state.auth)
 
   const handleLogout = async () => {
+    const setPending = useLoadingStore.getState().setPending
+    setPending('auth', true)
+
     try {
-      await signOut(auth)
+      await useAuthStore.getState().signOut()
       toast.success('로그아웃되었습니다.')
     } catch (error) {
       console.error('Logout error:', error)
       toast.error('로그아웃 중 오류가 발생했습니다.')
+    } finally {
+      setPending('auth', false)
     }
   }
 
@@ -26,7 +31,11 @@ const AppPageInner = () => {
 
       <div>{bibleManager.getVerse('창', '1', '1')}</div>
 
-      {user ? (
+      {isAuthLoading ? (
+        <button type="button" className="rounded-lg bg-gray-300 px-6 py-2 font-semibold text-gray-500" disabled>
+          처리중...
+        </button>
+      ) : user ? (
         <button
           type="button"
           onClick={handleLogout}

@@ -1,4 +1,5 @@
 import { SplashLayout } from '@/components/auth/SplashLayout'
+import { AuthProvider } from '@/components/providers/AuthProvider'
 import { Metadata, Viewport } from 'next'
 import { Toaster } from 'react-hot-toast'
 import './globals.css'
@@ -62,8 +63,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="apple-mobile-web-app-title" content="한빛공동체" />
       </head>
       <body>
-        <SplashLayout>{children}</SplashLayout>
-        <Toaster />
+        <AuthProvider>
+          <SplashLayout>{children}</SplashLayout>
+          <Toaster />
+        </AuthProvider>
       </body>
     </html>
   )
