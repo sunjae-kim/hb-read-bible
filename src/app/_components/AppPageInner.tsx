@@ -1,6 +1,7 @@
 'use client'
 
 import { KAKAO_AUTH_URL } from '@/constants'
+import { bibleManager } from '@/lib/bible'
 import { auth } from '@/lib/firebase'
 import { useAuthStore } from '@/stores/auth'
 import { signOut } from 'firebase/auth'
@@ -22,6 +23,8 @@ const AppPageInner = () => {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-4">
       {user && <p className="text-gray-700">안녕하세요, {user.providerData[0].displayName || '사용자'}님!</p>}
+
+      <div>{bibleManager.getVerse('창', '1', '1')}</div>
 
       {user ? (
         <button

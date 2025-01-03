@@ -14,6 +14,17 @@ const nextConfig: NextConfig = {
       },
     ]
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'hanbit-bible.vercel.app',
+        port: '',
+        pathname: '/images/**',
+        search: '',
+      },
+    ],
+  },
 }
 
 export default nextConfig
