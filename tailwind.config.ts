@@ -7,6 +7,14 @@ export default {
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   theme: {
+    screens: {
+      xs: '480px',
+      sm: '640px',
+      md: '768px',
+      lg: '1024px',
+      xl: '1280px',
+      '2xl': '1536px',
+    },
     extend: {
       animation: {
         'fade-in': 'fade-in 0.5s ease-out',
@@ -43,8 +51,8 @@ export default {
         ],
       },
       colors: {
-        primary: '#557C03'
-      }
+        primary: '#557C03',
+      },
     },
   },
   plugins: [],

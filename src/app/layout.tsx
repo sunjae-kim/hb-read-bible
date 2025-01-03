@@ -4,7 +4,10 @@ import { Metadata, Viewport } from 'next'
 import { Toaster } from 'react-hot-toast'
 import './globals.css'
 
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
+
 export const metadata: Metadata = {
+  metadataBase: new URL(baseUrl),
   title: '한빛공동체',
   description: '한빛교회 공동체가 함께하는 성경읽기',
   openGraph: {

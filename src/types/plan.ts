@@ -6,7 +6,6 @@ export interface BibleRange {
 
 export interface DailyReading {
   ranges: BibleRange[] // 하루에 여러 범위가 있을 수 있음
-  completed?: boolean // 읽기 완료 여부
 }
 
 export interface MonthlyPlan {

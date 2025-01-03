@@ -1,9 +1,10 @@
 'use client'
 
+import { useSplashState } from '@/hooks/useSplashState'
 import { usePlanStore } from '@/stores/plan'
 import Image from 'next/image'
 import { PropsWithChildren, useEffect } from 'react'
-import { useSplashState } from '@/hooks/useSplashState'
+import { BarLoader } from 'react-spinners'
 
 export const SplashLayout = ({ children }: PropsWithChildren) => {
   const { initialized, showSplash, isHiding, loadingState } = useSplashState()
@@ -30,7 +31,7 @@ export const SplashLayout = ({ children }: PropsWithChildren) => {
           <h1 className="sr-only text-2xl font-bold text-gray-800">한빛교회</h1>
           <p className="text-lg text-gray-600">공동체 성경읽기</p>
           <p className="mt-2 text-sm text-gray-400">{loadingState.message}</p>
-          <div className="mx-auto mt-4 h-1 w-16 animate-pulse rounded bg-gray-300" />
+          <BarLoader className="mx-auto mt-4" color="#557C03" />
         </div>
       </div>
     )

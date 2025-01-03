@@ -2,43 +2,38 @@
 
 import { kakaoAuth } from '@/lib/kakao'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef } from 'react'
+import { BounceLoader } from 'react-spinners'
 
 export default function AuthKakaoCallbackPage() {
   const searchParams = useSearchParams()
   const router = useRouter()
-  const [error, setError] = useState<Error | null>(null)
   const code = searchParams.get('code')
+  const signInAttempted = useRef(false)
 
   useEffect(() => {
-    if (!code) {
-      setError(new Error('인증 코드가 없습니다.'))
-      router.push('/')
+    if (!code || signInAttempted.current) {
       return
     }
 
+    signInAttempted.current = true
+    const next = searchParams.get('state') || ''
+
     kakaoAuth
       .signIn(code)
-      .then(() => router.push('/'))
-      .catch((err) => {
-        setError(err instanceof Error ? err : new Error('로그인 처리 중 오류가 발생했습니다.'))
-        router.push('/')
-      })
-  }, [code, router])
+      .then(() => router.push('/' + next))
+      .catch(() => router.push('/' + next))
+  }, [code, router, searchParams])
 
-  if (error) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <p className="text-red-500">오류가 발생했습니다: {error.message}</p>
-      </div>
-    )
+  if (!code) {
+    router.push('/')
+    return null
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center">
-      <div className="flex flex-col items-center gap-4">
-        <p>로그인 처리 중입니다...</p>
-      </div>
+    <div className="flex min-h-screen flex-col items-center justify-center">
+      <BounceLoader color="#557C03" size={50} />
+      <div className="mt-4 text-gray-800">로그인 중입니다</div>
     </div>
   )
 }

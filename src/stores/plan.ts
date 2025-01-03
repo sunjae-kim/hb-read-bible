@@ -13,7 +13,6 @@ interface PlanState {
 interface PlanActions {
   setActivePlan: (planId: string) => void
   getReadingForDate: (date: Date) => DailyReading | null
-  markAsCompleted: (date: Date, completed: boolean) => void
   createCustomPlan: (plan: ReadingPlan) => void
   loadDefaultPlan: () => Promise<void>
 }
@@ -30,7 +29,6 @@ export const usePlanStore = create<PlanState & PlanActions>()(
         try {
           set({ isLoading: true, error: null })
 
-          // TypeScript type assertion for defaultPlan
           const plan = defaultPlan as ReadingPlan
 
           set((state) => ({
@@ -55,41 +53,13 @@ export const usePlanStore = create<PlanState & PlanActions>()(
 
       getReadingForDate: (date) => {
         const { plans, activePlanId } = get()
-        console.log({ activePlanId })
         if (!activePlanId) return null
 
         const plan = plans[activePlanId]
         const month = String(date.getMonth() + 1)
         const day = String(date.getDate())
 
-        console.log(plan)
-
         return plan?.months[month]?.[day] || null
-      },
-
-      markAsCompleted: (date, completed) => {
-        set((state) => {
-          const { plans, activePlanId } = state
-          if (!activePlanId) return state
-
-          const plan = { ...plans[activePlanId] }
-          const month = String(date.getMonth() + 1)
-          const day = String(date.getDate())
-
-          if (plan.months[month]?.[day]) {
-            plan.months[month][day] = {
-              ...plan.months[month][day],
-              completed,
-            }
-          }
-
-          return {
-            plans: {
-              ...plans,
-              [activePlanId]: plan,
-            },
-          }
-        })
       },
 
       createCustomPlan: (plan) => {
