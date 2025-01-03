@@ -2,21 +2,23 @@
 
 import { useAuthStore } from '@/stores/auth'
 import { useBibleStore } from '@/stores/bible'
+import { usePlanStore } from '@/stores/plan'
 import Image from 'next/image'
 import { PropsWithChildren, useEffect, useState } from 'react'
 
 export const SplashLayout = ({ children }: PropsWithChildren) => {
   const authInitialized = useAuthStore((state) => state.initialized)
   const { initialized: bibleInitialized, initialize: bibleInitialize, loadingState } = useBibleStore()
+  const { loadDefaultPlan } = usePlanStore()
   const [showSplash, setShowSplash] = useState(true)
   const [isHiding, setIsHiding] = useState(false)
 
   useEffect(() => {
     bibleInitialize()
-  }, [bibleInitialize])
+    loadDefaultPlan()
+  }, [bibleInitialize, loadDefaultPlan])
 
   useEffect(() => {
-    // 모든 초기화가 완료되었을 때만 스플래시 화면 숨기기 시작
     if (authInitialized && bibleInitialized) {
       const timer = setTimeout(() => {
         setIsHiding(true)
